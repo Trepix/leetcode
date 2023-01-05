@@ -8,33 +8,56 @@
  *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
  * }
  */
-import java.util.ArrayList;
-import java.util.Arrays;
 
-import static java.util.Arrays.stream;
 class Solution {
    public ListNode mergeKLists(ListNode[] lists) {
-        ListNode head = new ListNode();
-        ListNode current = head;
-        ArrayList<ListNode> list = new ArrayList<>();
-        for (ListNode l : lists) {
-            if (l != null) list.add(l);
+        if (lists.length == 0) return null;
+        if (lists.length == 1) return lists[0];
+        return mergeKLists(lists, 0, lists.length - 1);
+    }
+
+    public ListNode mergeKLists(ListNode[] lists, int left, int right) {
+        if (right - left < 2) return mergeTwoLists(lists[left], lists[right]);
+        else  {
+            int middle = (right + left) / 2;
+            ListNode leftNode = mergeKLists(lists, left, middle);
+            ListNode rightNode = mergeKLists(lists, middle + 1, right);
+            return mergeTwoLists(leftNode, rightNode);
         }
+    }
 
-        if (list.size() == 1) return list.get(0);
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+        if (l1 == l2) return l1;
 
-        while (!list.isEmpty()) {
-            int min_position = -1;
-            for (int i = 0; i < list.size(); i++) {
-                if (min_position == -1) min_position = i;
-                else if (list.get(i).val < list.get(min_position).val) min_position = i;
+        ListNode current = new ListNode();
+        ListNode head = current;
+
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                current.next = l1;
+                l1 = l1.next;
             }
-            current.next = list.get(min_position);
+            else {
+                current.next = l2;
+                l2 = l2.next;
+            }
             current = current.next;
-            ListNode nextNode = list.get(min_position).next;
-            if (nextNode == null) list.remove(min_position);
-            else list.set(min_position, nextNode);
         }
+
+        while (l1 != null) {
+            current.next = l1;
+            current = current.next;
+            l1 = l1.next;
+        }
+
+        while (l2 != null) {
+            current.next = l2;
+            current = current.next;
+            l2 = l2.next;
+        }
+
         return head.next;
     }
 }
