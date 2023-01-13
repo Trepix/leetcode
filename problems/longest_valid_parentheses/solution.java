@@ -10,7 +10,7 @@ class Solution {
         execute(")()())()()(", 4);
         execute("()(()(((", 2);
         execute("()(())", 6);
-        execute("(()(())", 4);
+        execute("(()(())", 6);
         execute("((((()()()", 6);
         execute("))))))))()", 2);
     }
@@ -21,18 +21,24 @@ class Solution {
     }
 
     public int longestValidParentheses(String s) {
-        Stack<Integer> stack = new Stack<>();
-        stack.push(-1);
+        int open = 0, close = 0;
         int longest = 0;
         for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == '(') {
-                stack.push(i);
-            }
+            if (s.charAt(i) == '(') ++open;
             else {
-                stack.pop();
-                if (stack.isEmpty()) stack.push(i);
-                else longest = Math.max(longest, i - stack.peek());
+                ++close;
+                if (close > open) open = close = 0;
             }
+            if (open == close) longest = Math.max(longest, open + close);
+        }
+        open = close = 0;
+        for (int i = s.length() - 1; i >= 0; i--) {
+            if (s.charAt(i) == '(') {
+                ++open;
+                if (open > close) open = close = 0;
+            }
+            else ++close;
+            if (open == close) longest = Math.max(longest, open + close);
         }
         return longest;
     }
